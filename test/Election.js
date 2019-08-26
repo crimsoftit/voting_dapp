@@ -86,4 +86,15 @@ contract("Election", function(accounts) {
 			assert.equal(voteCount, 1, "increments candidate's vote count");
 		});
 	});
+
+	it("check for emission of votedEvent", function() {
+		return Election.deployed().then(function(instance) {
+			electionInstance = instance;
+			return electionInstance.vote(1, { from: accounts[2] });
+		}).then(function(receipt) {
+			assert.equal(receipt.logs.length, 1, "triggers one event");
+			assert.equal(receipt.logs[0].event, "votedEvent", "should be the votedEvent");
+			assert.equal(receipt.logs[0].args._candidateId, 1, "logs the candidate's id");
+		});
+	});
 });
