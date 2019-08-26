@@ -76,11 +76,33 @@ App = {
                     candidatesSelect.append(candidateOption);
                 });
             }
-        });
 
-        loader.hide();
-        content.show();
+            return electionInstance.voters(App.account);
+        }).then(function(hasVoted) {
+            if(hasVoted) {
+                $("form").hide();
+            }
+            loader.hide();
+            content.show();
+        }).catch(function(error) {
+            console.warn(error);
+        });        
     },
+
+    castVote: function() {
+        var candidateId = $("#candidatesSelect").val();
+        App.contracts.Election.deployed().then(function(instance) {
+            electionInstance = instance;
+            return electionInstance.vote(candidateId, { from: App.account });
+        }).then(function(result) {
+
+            // wait for votes to update
+            $("#content").hide();
+            $("#loader").show();
+        }).catch(function(err) {
+            console.error(err);
+        });
+    }
 };
 
 $(function() {
